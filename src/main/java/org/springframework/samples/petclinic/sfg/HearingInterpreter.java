@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
  * Created by jt on 2019-02-16.
  */
 @Service
-public class HearingInterprter {
+public class HearingInterpreter {
 
     private final WordProducer wordProducer;
 
-    public HearingInterprter(WordProducer wordProducer) {
+    public HearingInterpreter(WordProducer wordProducer) {
         this.wordProducer = wordProducer;
     }
 
