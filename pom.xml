@@ -41,7 +41,7 @@
         <!-- Persistence -->
         <spring-data-releasetrain.version>Lovelace-RELEASE</spring-data-releasetrain.version>
         <hibernate.version>5.4.1.Final</hibernate.version>
-        <hibernate-validator.version>6.0.14.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.1.0.Final</hibernate-validator.version>
         <hsqldb.version>2.4.1</hsqldb.version>
 
         <!-- Logging -->
