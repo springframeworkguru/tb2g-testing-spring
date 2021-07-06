@@ -8,6 +8,8 @@ import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +18,14 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringJUnitWebConfig(locations = {"classpath:spring/mvc-test-config.xml", "classpath:spring/mvc-core-config.xml"})
 class OwnerControllerTest {
+
+    private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
     @Autowired
     OwnerController ownerController;
@@ -50,11 +56,37 @@ class OwnerControllerTest {
     }
 
     @Test
-    void testFindByNameNotFound() throws Exception {
-        mockMvc.perform(get("/owners")
-                .param("lastName", "Don't find ME!"))
+    // This test has just been rewritten!!!!
+    void testProcessCreationForm_ValidPath() throws Exception {
+        // Given
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        // The ID is sent as Param, but will not be taken in account.
+        // Also see the comment in line77
+        multiValueMap.add("id","4");
+        multiValueMap.add("firstName","Owner");
+        multiValueMap.add("lastName","Mock");
+        multiValueMap.add("address","Rue des manguiers");
+        multiValueMap.add("city","Douala");
+        multiValueMap.add("telephone","1234567");
+
+        mockMvc.perform(post("/owners/new")
+                    .params(multiValueMap))
+                .andExpect(status().is3xxRedirection())
+                // Doesn't exists in this case
+//                .andExpect(model().attributeHasNoErrors("firstName,lastName,address,city,telephone"))
+                // we can not submit an id in the form the way the Controller is implemented!!!!
+                .andExpect(view().name("redirect:/owners/null"))
+                .andDo(print());
+    }
+
+    @Test
+    // the new Test
+    void testProcessCreationForm_InvalidPath() throws Exception {
+        mockMvc.perform(post("/owners/new"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("owners/findOwners"));
+                .andExpect(model().attributeHasFieldErrorCode("owner","lastName","NotEmpty"))
+                .andExpect(view().name(VIEWS_OWNER_CREATE_OR_UPDATE_FORM))
+                .andDo(print());
     }
 
     @Test
