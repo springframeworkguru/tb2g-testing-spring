@@ -19,7 +19,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -69,16 +69,15 @@ class OwnerControllerTest {
 
         justOne.setLastName(findJustOne);
 
-        given(clinicService.findOwnerByLastName(findJustOne)).willReturn(Lists.newArrayList(justOne));
+        doReturn(Lists.newArrayList(justOne)).when(clinicService).findOwnerByLastName(findJustOne);
 
         mockMvc.perform(get("/owners")
                     .param("lastName", findJustOne))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/owners/1"));
-
-        then(clinicService).should().findOwnerByLastName(anyString());
-
-    }
+        verify(clinicService,times(1)).findOwnerByLastName(stringArgumentCaptor.capture());
+        assertThat(stringArgumentCaptor.getValue()).isEqualToIgnoringCase(findJustOne);
+     }
 
     @Test
     void testFindByNameNotFound() throws Exception {
