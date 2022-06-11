@@ -11,14 +11,11 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {BaseConfig.class, LaurelConfig.class})
 public class HearingInterpreterTest {
-
     @Autowired
     HearingInterpreter hearingInterpreter;
-
     @Test
     public void whatIheard() {
-        String word = hearingInterpreter.whatIHeard();
-
+        String word = hearingInterpreter.whatIheard();
 
         assertEquals("Laurel", word);
     }
