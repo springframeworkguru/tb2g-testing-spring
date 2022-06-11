@@ -2,11 +2,12 @@ package org.springframework.samples.petclinic.sfg;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 @Configuration
-public class LaurelConfig {
+public class YannyConfig {
 
     @Bean
-    LaurelWordProducer laurelWordProducer(){
-        return new LaurelWordProducer();
+    YannyWordProducer yannyWordProducer(){
+        return new YannyWordProducer();
     }
 }
