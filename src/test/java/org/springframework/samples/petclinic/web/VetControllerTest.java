@@ -9,55 +9,72 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.samples.petclinic.model.Vet;
 import org.springframework.samples.petclinic.model.Vets;
 import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 class VetControllerTest {
 
     @Mock
-    Map<String, Object> model;
-    @Mock
     ClinicService clinicService;
+
+    @Mock
+    Map<String, Object> model;
 
     @InjectMocks
     VetController controller;
 
+    List<Vet> vetsList = new ArrayList<>();
+
+    MockMvc mockMvc;
+
     @BeforeEach
-    void setUp(){
-        Vet vet = new Vet();
-        List<Vet> vetsList = new ArrayList<>();
-        vetsList.add(vet);
+    void setUp() {
+        vetsList.add(new Vet());
+
         given(clinicService.findVets()).willReturn(vetsList);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
+    @Test
+    void testControllerShowVetList() throws Exception {
+        mockMvc.perform(get("/vets.html"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("vets"))
+                .andExpect(view().name("vets/vetList"));
     }
 
     @Test
     void showVetList() {
-
         //when
-        String res = controller.showVetList(model);
+        String view = controller.showVetList(model);
 
         //then
-        then(model).should(times(1)).put(anyString(), any());
-        then(clinicService).should(times(1)).findVets();
-        assertEquals("vets/vetList", res);
+        then(clinicService).should().findVets();
+        then(model).should().put(anyString(), any());
+        assertThat("vets/VetList").isEqualToIgnoringCase(view);
     }
 
     @Test
     void showResourcesVetList() {
-
         //when
-        Vets res = controller.showResourcesVetList();
+        Vets vets = controller.showResourcesVetList();
 
         //then
-        then(clinicService).should(times(1)).findVets();
-        assertEquals(res.getVetList().size(), 1);
+        then(clinicService).should().findVets();
+        assertThat(vets.getVetList()).hasSize(1);
     }
 }
